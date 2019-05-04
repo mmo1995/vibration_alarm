@@ -69,6 +69,11 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       setState(() {
         connected = true;
       });
+
+      wearable.state.then((s) {
+        print(wearable.state.toString());
+      });
+
       wearable.onStateChanged().listen((s){
 
         if(s == BluetoothDeviceState.disconnected){
