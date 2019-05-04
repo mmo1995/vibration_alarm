@@ -41,10 +41,11 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
   bool connected = false;
 
   FlutterBlue _flutterBlue = FlutterBlue.instance;
-  var _scanSubscription;
+  var deviceConnection;
   var wearable;
+
   void _scan(){
-    _scanSubscription = _flutterBlue
+    _flutterBlue
         .scan(
       timeout: const Duration(seconds: 1)
     )
@@ -60,6 +61,11 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
   }
   void _connect(){
     if(wearable != null){
+      deviceConnection = _flutterBlue
+          .connect(wearable, timeout: const Duration(seconds: 4))
+          .listen(
+        null,
+      );
       setState(() {
         connected = true;
       });
@@ -83,8 +89,12 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
   }
 
   void _disconnect(){
+    deviceConnection?.cancel();
     setState(() {
       connected = false;
+    });
+    setState(() {
+      wearable = null;
     });
     print('disconnected');
     print(connected);
