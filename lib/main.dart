@@ -36,8 +36,8 @@ class MyFirstTabView extends StatefulWidget{
   _MyFirstTabViewState createState() => new _MyFirstTabViewState();
 }
 
-class _MyFirstTabViewState extends State{
-  bool connected;
+class _MyFirstTabViewState extends State with AutomaticKeepAliveClientMixin{
+  bool connected = false;
 
   void _connect(){
     setState(() {
@@ -82,6 +82,9 @@ class _MyFirstTabViewState extends State{
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 class MySecondTabView extends StatelessWidget{
