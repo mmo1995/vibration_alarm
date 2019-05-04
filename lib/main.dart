@@ -115,6 +115,9 @@ class _TimerViewState extends State with TickerProviderStateMixin {
   var input = 0;
   void saveInput(string){
     if(timerStarted == true){
+      setState(() {
+        controller.text = '';
+      });
       print('Timer Already Started!');
     }
     else {
@@ -162,7 +165,7 @@ class _TimerViewState extends State with TickerProviderStateMixin {
                     WhitelistingTextInputFormatter.digitsOnly
                   ],
                   decoration: InputDecoration(
-                      labelText: "Please Set Timer!",
+                      labelText: timerStarted? "Timer is Running!" : "Please Set Timer!",
                       hintText: "In Seconds",
                       labelStyle: TextStyle(fontSize: 25),
                       icon: Icon(Icons.access_time)),
