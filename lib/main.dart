@@ -3,8 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-import 'dart:math' as math;
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -42,12 +40,46 @@ class WearableConnectionView extends StatefulWidget{
 class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMixin{
   bool connected = false;
 
+  FlutterBlue _flutterBlue = FlutterBlue.instance;
+  var _scanSubscription;
+  var wearable;
+  void _scan(){
+    _scanSubscription = _flutterBlue
+        .scan(
+      timeout: const Duration(seconds: 1)
+    )
+        .listen((scanResult) {
+      if(scanResult.device.name == 'TECO Wearable 3'){
+        wearable = scanResult.device;
+      }
+
+
+    }, onDone: _connect);
+
+
+  }
   void _connect(){
-    setState(() {
-      connected = true;
-    });
-    print('connected');
-    print(connected);
+    if(wearable != null){
+      setState(() {
+        connected = true;
+      });
+      print('connected');
+      print(connected);
+    }
+    else{
+      showDialog(context: context, builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text('Wearable not found'),
+          content: new Text('Please Try connecting again!'),
+          actions: <Widget>[
+            new FlatButton(onPressed: () {
+              Navigator.of(context).pop();
+            }, child: new Text('Close'))
+          ],
+        );
+      });
+      print('wearable not found!');
+    }
   }
 
   void _disconnect(){
@@ -89,7 +121,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
             child: new Text('Disconnect'),
             color: Colors.red,
             textColor: Colors.white,),
-          new RaisedButton(onPressed: connected ? null : _connect,
+          new RaisedButton(onPressed: connected ? null : _scan,
             child: new Text('Connect'),
             color: Colors.blue,
             textColor: Colors.white,),
