@@ -15,8 +15,8 @@ class MyApp extends StatelessWidget {
           appBar: AppBar(
             title: Text('My Vibration Alarm'),
             bottom: TabBar(tabs: <Widget>[
-              new Tab(text: 'first tab',),
-              new Tab(text: 'second tab')
+              new Tab(text: 'Wearable Connection',),
+              new Tab(text: 'Timer')
 
             ]),
           ),
@@ -63,10 +63,22 @@ class _MyFirstTabViewState extends State with AutomaticKeepAliveClientMixin{
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          connected ?  new Icon(Icons.bluetooth_connected)
-              : const Icon(Icons.bluetooth_disabled),
+          connected ?  new Icon(Icons.bluetooth_connected, color: Colors.blue, size: 50.0)
+              : const Icon(Icons.bluetooth_disabled, color: Colors.grey, size: 50.0),
         ],
+          
         ),
+        new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children:
+            <Widget>[
+              new Text(connected? 'Connected': 'Not Connected',
+                style: TextStyle(fontSize: 30,
+                    color: connected? Colors.blue : Colors.grey),)]),
+        new Row(
+          children:
+          <Widget>[
+            new Container(padding: EdgeInsets.all(20.0))],),
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
