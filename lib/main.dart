@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 void main() => runApp(MyApp());
@@ -19,8 +21,8 @@ class MyApp extends StatelessWidget {
             ]),
           ),
           body: TabBarView(children: [
-            new MyClass(),
-            new MySecondClass()
+            new MyFirstTabView(),
+            new MySecondTabView()
 
           ]),
         ),
@@ -29,13 +31,60 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyClass extends StatelessWidget{
+class MyFirstTabView extends StatefulWidget{
+  @override
+  _MyFirstTabViewState createState() => new _MyFirstTabViewState();
+}
 
-  void _connect(){
-    print('connected');
+class _MyFirstTabViewState extends State{
+
+ FlutterBlue _flutterBlue = FlutterBlue.instance;
+ StreamSubscription _scanSubscription;
+  bool _isButtonDisabled = false;
+ BluetoothDevice wearable;
+
+
+  void _scan(){
+
+      _scanSubscription = _flutterBlue
+          .scan(
+        timeout: const Duration(seconds: 5),
+      )
+          .listen((scanResult) {
+            print(scanResult.device.name);
+        if(scanResult.device.name == 'TECO Wearable 3'){
+          wearable = scanResult.device;
+        }
+      }, onDone: _connect);
+
+
   }
+  void _connect(){
+    if(wearable == null){
+      print('wearable not found');
+    }
+    else{
+      _flutterBlue.connect(wearable).listen((s) async{
+        if(BluetoothDeviceState.connected == s){
+          print(wearable.name);
+          print('connected');
+          _isButtonDisabled = true;
+        }
+        else if(BluetoothDeviceState.disconnected == s){
+          _disconnect();
+        }
+        else{
+          print('could not connect');
+        }
+      });
+
+    }
+  }
+
   void _disconnect(){
+    wearable = null;
     print('disconnected');
+    _isButtonDisabled = false;
   }
   @override
   Widget build(BuildContext context) {
@@ -47,7 +96,7 @@ class MyClass extends StatelessWidget{
         child: new Text('Disconnect'),
         color: Colors.red,
         textColor: Colors.white,),
-      new RaisedButton(onPressed: _connect,
+      new RaisedButton(onPressed: _isButtonDisabled ? null : _scan,
         child: new Text('Connect'),
         color: Colors.blue,
         textColor: Colors.white,),
@@ -55,7 +104,7 @@ class MyClass extends StatelessWidget{
   }
 }
 
-class MySecondClass extends StatelessWidget{
+class MySecondTabView extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
 
