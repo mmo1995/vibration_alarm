@@ -31,10 +31,27 @@ class MyApp extends StatelessWidget {
 
 class MyClass extends StatelessWidget{
 
+  void _connect(){
+    print('connected');
+  }
+  void _disconnect(){
+    print('disconnected');
+  }
   @override
   Widget build(BuildContext context) {
 
-    return new Text('first tab');
+    return new Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+      new RaisedButton(onPressed: _disconnect,
+        child: new Text('Disconnect'),
+        color: Colors.red,
+        textColor: Colors.white,),
+      new RaisedButton(onPressed: _connect,
+        child: new Text('Connect'),
+        color: Colors.blue,
+        textColor: Colors.white,),
+    ],);
   }
 }
 
