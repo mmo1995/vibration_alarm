@@ -21,8 +21,8 @@ class MyApp extends StatelessWidget {
             ]),
           ),
           body: TabBarView(children: [
-            new MyFirstTabView(),
-            new MySecondTabView()
+            new WearableConnectionView(),
+            new TimerView()
 
           ]),
         ),
@@ -31,12 +31,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyFirstTabView extends StatefulWidget{
+class WearableConnectionView extends StatefulWidget{
   @override
-  _MyFirstTabViewState createState() => new _MyFirstTabViewState();
+  _WearableConnectionViewState createState() => new _WearableConnectionViewState();
 }
 
-class _MyFirstTabViewState extends State with AutomaticKeepAliveClientMixin{
+class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMixin{
   bool connected = false;
 
   void _connect(){
@@ -99,7 +99,7 @@ class _MyFirstTabViewState extends State with AutomaticKeepAliveClientMixin{
   bool get wantKeepAlive => true;
 }
 
-class MySecondTabView extends StatelessWidget{
+class TimerView extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
 
