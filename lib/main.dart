@@ -42,7 +42,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   var deviceConnection;
-  var wearable;
+  BluetoothDevice wearable;
 
   void _scan(){
     _flutterBlue
@@ -59,7 +59,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
 
   }
-  void _connect(){
+  void _connect() async{
     if(wearable != null){
       deviceConnection = _flutterBlue
           .connect(wearable, timeout: const Duration(seconds: 4))
@@ -68,6 +68,12 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       );
       setState(() {
         connected = true;
+      });
+      wearable.onStateChanged().listen((s){
+
+        if(s == BluetoothDeviceState.disconnected){
+          _disconnect();
+        }
       });
       print('connected');
       print(connected);
