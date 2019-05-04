@@ -1,7 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -37,70 +37,50 @@ class MyFirstTabView extends StatefulWidget{
 }
 
 class _MyFirstTabViewState extends State{
+  bool connected;
 
- FlutterBlue _flutterBlue = FlutterBlue.instance;
- StreamSubscription _scanSubscription;
-  bool _isButtonDisabled = false;
- BluetoothDevice wearable;
-
-
-  void _scan(){
-
-      _scanSubscription = _flutterBlue
-          .scan(
-        timeout: const Duration(seconds: 5),
-      )
-          .listen((scanResult) {
-            print(scanResult.device.name);
-        if(scanResult.device.name == 'TECO Wearable 3'){
-          wearable = scanResult.device;
-        }
-      }, onDone: _connect);
-
-
-  }
   void _connect(){
-    if(wearable == null){
-      print('wearable not found');
-    }
-    else{
-      _flutterBlue.connect(wearable).listen((s) async{
-        if(BluetoothDeviceState.connected == s){
-          print(wearable.name);
-          print('connected');
-          _isButtonDisabled = true;
-        }
-        else if(BluetoothDeviceState.disconnected == s){
-          _disconnect();
-        }
-        else{
-          print('could not connect');
-        }
-      });
-
-    }
+    setState(() {
+      connected = true;
+    });
+    print('connected');
+    print(connected);
   }
 
   void _disconnect(){
-    wearable = null;
+    setState(() {
+      connected = false;
+    });
     print('disconnected');
-    _isButtonDisabled = false;
+    print(connected);
   }
   @override
   Widget build(BuildContext context) {
 
-    return new Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-      new RaisedButton(onPressed: _disconnect,
-        child: new Text('Disconnect'),
-        color: Colors.red,
-        textColor: Colors.white,),
-      new RaisedButton(onPressed: _isButtonDisabled ? null : _scan,
-        child: new Text('Connect'),
-        color: Colors.blue,
-        textColor: Colors.white,),
-    ],);
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          connected ?  new Icon(Icons.bluetooth_connected)
+              : const Icon(Icons.bluetooth_disabled),
+        ],
+        ),
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+          new RaisedButton(onPressed: connected ? _disconnect : null,
+            child: new Text('Disconnect'),
+            color: Colors.red,
+            textColor: Colors.white,),
+          new RaisedButton(onPressed: connected ? null : _connect,
+            child: new Text('Connect'),
+            color: Colors.blue,
+            textColor: Colors.white,),
+        ],),
+      ],
+    );
   }
 }
 
