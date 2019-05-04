@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'dart:math' as math;
 
 void main() => runApp(MyApp());
 
@@ -99,11 +102,86 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
   bool get wantKeepAlive => true;
 }
 
-class TimerView extends StatelessWidget{
+class TimerView extends StatefulWidget{
+  @override
+  _TimerViewState createState() => new _TimerViewState();
+}
+
+class _TimerViewState extends State with TickerProviderStateMixin {
+
+  final controller = new TextEditingController();
+  Timer _timer;
+  bool timerStarted = false;
+  var input = 0;
+  void saveInput(string){
+    if(timerStarted == true){
+      print('Timer Already Started!');
+    }
+    else {
+      print(string);
+      input = int.tryParse(string);
+      print('input  $input');
+      print("field submitted");
+      setState(() {
+        controller.text = '';
+      });
+      startTimer();
+    }
+  }
+  void startTimer() {
+    setState(() {
+      timerStarted = true;
+    });
+    const oneSec = const Duration(seconds: 1);
+    _timer = new Timer.periodic(
+        oneSec,
+            (Timer timer) => setState(() {
+          if (input < 1) {
+            timer.cancel();
+            timerStarted = false;
+          } else {
+            input = input - 1;
+          }
+        }));
+  }
+
   @override
   Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
 
-    return new Text('second tab');
+            new Flexible(
+              child: new TextFormField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    WhitelistingTextInputFormatter.digitsOnly
+                  ],
+                  decoration: InputDecoration(
+                      labelText: "Please Set Timer!",
+                      hintText: "In Seconds",
+                      labelStyle: TextStyle(fontSize: 25),
+                      icon: Icon(Icons.access_time)),
+                      onFieldSubmitted: saveInput,
+
+              ),
+            ),
+          ],
+        ),
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>
+          [
+            new Text('$input', style: TextStyle(fontSize: 50.0),)
+          ],),
+        new Row(children: <Widget>[],)
+      ],
+    );
   }
+
 
 }
