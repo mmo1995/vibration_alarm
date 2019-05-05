@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 var input = ValueNotifier(0);
+var intensity = 0;
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -183,7 +184,21 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
           vibrationCharacteristic = c;
         }
       }
-      await wearable.writeCharacteristic(vibrationCharacteristic, [0xFF,0xFF,0xFF,0xFF]);
+      switch (intensity){
+        case 0:
+          await wearable.writeCharacteristic(vibrationCharacteristic, [0x77,0x00,0x77,0x00]);
+          break;
+        case 1:
+          await wearable.writeCharacteristic(vibrationCharacteristic, [0x00,0xCC,0x00,0xCC]);
+          break;
+        case 2:
+          await wearable.writeCharacteristic(vibrationCharacteristic, [0xFF,0xFF,0xFF,0xFF]);
+          break;
+        default:
+          await wearable.writeCharacteristic(vibrationCharacteristic, [0x77,0x00,0x77,0x00]);
+          break;
+      }
+
       showDialog(context: context, builder: (BuildContext context) {
         return AlertDialog(
           title: new Text('VIBRATING'),
@@ -263,6 +278,7 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
   final controller = new TextEditingController();
   Timer _timer;
   bool timerStarted = false;
+
   void saveInput(string){
     if(timerStarted == true){
       setState(() {
@@ -298,10 +314,18 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
         }));
   }
 
+  void changeIntensity(value){
+    setState(() {
+
+      intensity = value;
+    });
+    print(intensity);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -325,6 +349,27 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
             ),
           ],
         ),
+        new Row(children: <Widget>[Padding(padding: EdgeInsets.all(30.0))],),
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Text('Vibration Intinsity:',
+              style: TextStyle(fontSize: 20, color: Colors.blue),)],),
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new ButtonBar(
+              children: <Widget>[
+              new Text('low'),
+              new Radio(value: 0, groupValue: intensity, onChanged: changeIntensity,activeColor: Colors.blue),
+              new Text('medium'),
+              new Radio(value: 1, groupValue: intensity, onChanged: changeIntensity, activeColor: Colors.blue),
+              new Text('high'),
+              new Radio(value: 2, groupValue: intensity, onChanged: changeIntensity, activeColor: Colors.blue)
+            ],)
+          ],
+        ),
+        new Row(children: <Widget>[Padding(padding: EdgeInsets.all(20.0))],),
         new Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>
