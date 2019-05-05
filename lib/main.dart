@@ -44,6 +44,7 @@ class WearableConnectionView extends StatefulWidget{
 class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMixin{
 
   bool blueOn;
+  bool connecting = false;
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   List<BluetoothService> services;
   List<BluetoothCharacteristic> characteristics;
@@ -54,6 +55,10 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
   BluetoothCharacteristic vibrationCharacteristic;
   var _scanSubscription;
   void _scan() async{
+    setState(() {
+      connecting = true;
+    });
+    
     blueOn = await _flutterBlue.isOn;
     if(blueOn){
       _scanSubscription = _flutterBlue
@@ -69,6 +74,9 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       }, onDone: _connect);
     }
     else{
+      setState(() {
+        connecting = false;
+      });
       showDialog(context: context, builder: (BuildContext context) {
         return AlertDialog(
           title: new Text('Bluetooth Adapter is off'),
@@ -112,7 +120,11 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
           deviceState =s;
         });
 
-
+        if(s == BluetoothDeviceState.connected){
+          setState(() {
+            connecting = false;
+          });
+        }
         if(s == BluetoothDeviceState.disconnected){
           _disconnect();
           input.removeListener(vibrate);
@@ -132,7 +144,12 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
         );
       });
       print('wearable not found!');
+      setState(() {
+        connecting = false;
+      });
     }
+
+    
   }
 
   void _disconnect(){
@@ -192,6 +209,11 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
+        new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Text(connecting? 'Connecting...' : '',
+              style: TextStyle(fontSize: 25.0, color: Colors.grey),)],),
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
