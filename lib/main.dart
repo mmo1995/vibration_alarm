@@ -69,7 +69,18 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       }, onDone: _connect);
     }
     else{
-      print('BLUETOOTH NOT ON!');
+      showDialog(context: context, builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text('Bluetooth Adapter is off'),
+          content: new Text('Please Turn it on and connect again!'),
+          actions: <Widget>[
+            new FlatButton(onPressed: () {
+              Navigator.of(context).pop();
+            }, child: new Text('Close'))
+          ],
+        );
+      });
+      print('Bluetooth Off!');
 
     }
 
