@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-
+var input = ValueNotifier(0);
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -19,12 +19,13 @@ class MyApp extends StatelessWidget {
             bottom: TabBar(
                 tabs: <Widget>[
 
-              new Tab(text: 'Wearable Connection',),
+              new Tab(text: 'Wearable Connection'),
               new Tab(text: 'Timer')
 
             ]),
           ),
-          body: TabBarView(children: [
+          body: TabBarView(
+              children: [
             new WearableConnectionView(),
             new TimerView()
 
@@ -42,13 +43,18 @@ class WearableConnectionView extends StatefulWidget{
 
 class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMixin{
 
+
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   List<BluetoothService> services;
+  List<BluetoothCharacteristic> characteristics;
   var deviceConnection;
   BluetoothDevice wearable;
   BluetoothDeviceState deviceState;
+  BluetoothService vibrationService;
+  BluetoothCharacteristic vibrationCharacteristic;
   var _scanSubscription;
   void _scan(){
+
     _scanSubscription = _flutterBlue
         .scan(
       timeout: const Duration(seconds: 5)
@@ -61,7 +67,6 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
     }, onDone: _connect);
 
-
   }
   void _connect() async{
     _scanSubscription?.cancel();
@@ -73,6 +78,9 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
         null,
       );
 
+      input.addListener(vibrate);
+
+
       wearable.state.then((s) {
         setState(() {
           deviceState = s;
@@ -80,6 +88,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
         print(wearable.state.toString());
       });
+
       wearable.onStateChanged().listen((s){
         setState(() {
           deviceState =s;
@@ -88,6 +97,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
         if(s == BluetoothDeviceState.disconnected){
           _disconnect();
+          input.removeListener(vibrate);
         }
       });
     }
@@ -109,6 +119,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
   void _disconnect(){
     deviceConnection?.cancel();
+    input.removeListener(vibrate);
     wearable.state.then((s) {
       setState(() {
         deviceState = s;
@@ -119,6 +130,42 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       });
       print('disconnected');
     });
+  }
+
+  void vibrate() async{
+
+    if(input.value == 0){
+      services = await wearable.discoverServices();
+      services.forEach((service) {
+        if(service.uuid == new Guid('713d0000-503e-4c75-ba94-3148f18d941e')){
+          vibrationService = service;
+        }
+      });
+
+      characteristics = vibrationService.characteristics;
+      for(BluetoothCharacteristic c in characteristics){
+        if(c.uuid == new Guid('713D0003-503E-4C75-BA94-3148F18D941E')){
+          vibrationCharacteristic = c;
+        }
+      }
+      await wearable.writeCharacteristic(vibrationCharacteristic, [0xFF,0xFF,0xFF,0xFF]);
+      showDialog(context: context, builder: (BuildContext context) {
+        return AlertDialog(
+          title: new Text('VIBRATING'),
+          content: new Text('VIBRATING'),
+          actions: <Widget>[
+            new FlatButton(onPressed: stopVibrating, child: new Text('Close'))
+          ],
+        );
+      });
+    }
+
+
+  }
+
+  void stopVibrating(){
+    Navigator.of(context).pop();
+    wearable.writeCharacteristic(vibrationCharacteristic, [0x00, 0x00, 0x00, 0x00]);
   }
 
   @override
@@ -176,7 +223,6 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
   final controller = new TextEditingController();
   Timer _timer;
   bool timerStarted = false;
- var input = 0;
   void saveInput(string){
     if(timerStarted == true){
       setState(() {
@@ -186,7 +232,7 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
     }
     else {
       print(string);
-      input = int.tryParse(string);
+      input.value = int.tryParse(string);
       print('input  $input');
       print("field submitted");
       setState(() {
@@ -203,11 +249,11 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
     _timer = new Timer.periodic(
         oneSec,
             (Timer timer) => setState(() {
-          if (input < 1) {
+          if (input.value < 1) {
             timer.cancel();
             timerStarted = false;
           } else {
-            input = input - 1;
+            input.value = input.value - 1;
           }
         }));
   }
@@ -243,7 +289,7 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>
           [
-            new Text('$input', style: TextStyle(fontSize: 50.0),)
+            new Text(input.value.toString(), style: TextStyle(fontSize: 50.0),)
           ],),
         new Row(children: <Widget>[],)
       ],
