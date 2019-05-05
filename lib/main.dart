@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -41,7 +42,6 @@ class WearableConnectionView extends StatefulWidget{
 
 class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMixin{
 
-  var input = _TimerViewState.input;
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   List<BluetoothService> services;
   var deviceConnection;
@@ -51,7 +51,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
   void _scan(){
     _scanSubscription = _flutterBlue
         .scan(
-      timeout: const Duration(seconds: 1)
+      timeout: const Duration(seconds: 5)
     )
         .listen((scanResult) {
       if(scanResult.device.name == 'TECO Wearable 3'){
@@ -73,7 +73,6 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
         null,
       );
 
-      print('input is: $input');//HIER bin ich stehen geblieben!
       wearable.state.then((s) {
         setState(() {
           deviceState = s;
@@ -177,7 +176,7 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
   final controller = new TextEditingController();
   Timer _timer;
   bool timerStarted = false;
- static var input = 0;
+ var input = 0;
   void saveInput(string){
     if(timerStarted == true){
       setState(() {
