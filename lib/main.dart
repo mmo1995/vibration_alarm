@@ -15,7 +15,9 @@ class MyApp extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             title: Text('My Vibration Alarm'),
-            bottom: TabBar(tabs: <Widget>[
+            bottom: TabBar(
+                tabs: <Widget>[
+
               new Tab(text: 'Wearable Connection',),
               new Tab(text: 'Timer')
 
@@ -39,8 +41,9 @@ class WearableConnectionView extends StatefulWidget{
 
 class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMixin{
 
-
+  var input = _TimerViewState.input;
   FlutterBlue _flutterBlue = FlutterBlue.instance;
+  List<BluetoothService> services;
   var deviceConnection;
   BluetoothDevice wearable;
   BluetoothDeviceState deviceState;
@@ -70,6 +73,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
         null,
       );
 
+      print('input is: $input');//HIER bin ich stehen geblieben!
       wearable.state.then((s) {
         setState(() {
           deviceState = s;
@@ -77,7 +81,6 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
         print(wearable.state.toString());
       });
-
       wearable.onStateChanged().listen((s){
         setState(() {
           deviceState =s;
@@ -118,6 +121,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       print('disconnected');
     });
   }
+
   @override
   Widget build(BuildContext context) {
 
@@ -168,12 +172,12 @@ class TimerView extends StatefulWidget{
   _TimerViewState createState() => new _TimerViewState();
 }
 
-class _TimerViewState extends State with TickerProviderStateMixin {
+class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeepAliveClientMixin{
 
   final controller = new TextEditingController();
   Timer _timer;
   bool timerStarted = false;
-  var input = 0;
+ static var input = 0;
   void saveInput(string){
     if(timerStarted == true){
       setState(() {
@@ -246,6 +250,9 @@ class _TimerViewState extends State with TickerProviderStateMixin {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
 
 }
