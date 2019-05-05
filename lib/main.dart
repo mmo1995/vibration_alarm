@@ -38,14 +38,15 @@ class WearableConnectionView extends StatefulWidget{
 }
 
 class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMixin{
-  bool connected = false;
+
 
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   var deviceConnection;
   BluetoothDevice wearable;
-
+  BluetoothDeviceState deviceState;
+  var _scanSubscription;
   void _scan(){
-    _flutterBlue
+    _scanSubscription = _flutterBlue
         .scan(
       timeout: const Duration(seconds: 1)
     )
@@ -60,28 +61,33 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
   }
   void _connect() async{
+    _scanSubscription?.cancel();
+    _scanSubscription = null;
     if(wearable != null){
       deviceConnection = _flutterBlue
-          .connect(wearable, timeout: const Duration(seconds: 4))
+          .connect(wearable, timeout: const Duration(seconds: 15))
           .listen(
         null,
       );
-      setState(() {
-        connected = true;
-      });
 
       wearable.state.then((s) {
+        setState(() {
+          deviceState = s;
+        });
+
         print(wearable.state.toString());
       });
 
       wearable.onStateChanged().listen((s){
+        setState(() {
+          deviceState =s;
+        });
+
 
         if(s == BluetoothDeviceState.disconnected){
           _disconnect();
         }
       });
-      print('connected');
-      print(connected);
     }
     else{
       showDialog(context: context, builder: (BuildContext context) {
@@ -101,14 +107,16 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
   void _disconnect(){
     deviceConnection?.cancel();
-    setState(() {
-      connected = false;
+    wearable.state.then((s) {
+      setState(() {
+        deviceState = s;
+        print('deviceState: '+deviceState.toString());
+      });
+      setState(() {
+        wearable = null;
+      });
+      print('disconnected');
     });
-    setState(() {
-      wearable = null;
-    });
-    print('disconnected');
-    print(connected);
   }
   @override
   Widget build(BuildContext context) {
@@ -119,7 +127,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          connected ?  new Icon(Icons.bluetooth_connected, color: Colors.blue, size: 50.0)
+          (deviceState == BluetoothDeviceState.connected) ?  new Icon(Icons.bluetooth_connected, color: Colors.blue, size: 50.0)
               : const Icon(Icons.bluetooth_disabled, color: Colors.grey, size: 50.0),
         ],
           
@@ -128,9 +136,9 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children:
             <Widget>[
-              new Text(connected? 'Connected': 'Not Connected',
+              new Text((deviceState == BluetoothDeviceState.connected)? 'Connected': 'Not Connected',
                 style: TextStyle(fontSize: 30,
-                    color: connected? Colors.blue : Colors.grey),)]),
+                    color: (deviceState == BluetoothDeviceState.connected)? Colors.blue : Colors.grey),)]),
         new Row(
           children:
           <Widget>[
@@ -138,11 +146,11 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
         new Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-          new RaisedButton(onPressed: connected ? _disconnect : null,
+          new RaisedButton(onPressed: (deviceState == BluetoothDeviceState.connected) ? _disconnect : null,
             child: new Text('Disconnect'),
             color: Colors.red,
             textColor: Colors.white,),
-          new RaisedButton(onPressed: connected ? null : _scan,
+          new RaisedButton(onPressed: (deviceState == BluetoothDeviceState.connected) ? null : _scan,
             child: new Text('Connect'),
             color: Colors.blue,
             textColor: Colors.white,),
