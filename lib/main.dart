@@ -43,7 +43,7 @@ class WearableConnectionView extends StatefulWidget{
 
 class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMixin{
 
-
+  bool blueOn;
   FlutterBlue _flutterBlue = FlutterBlue.instance;
   List<BluetoothService> services;
   List<BluetoothCharacteristic> characteristics;
@@ -53,19 +53,26 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
   BluetoothService vibrationService;
   BluetoothCharacteristic vibrationCharacteristic;
   var _scanSubscription;
-  void _scan(){
+  void _scan() async{
+    blueOn = await _flutterBlue.isOn;
+    if(blueOn){
+      _scanSubscription = _flutterBlue
+          .scan(
+          timeout: const Duration(seconds: 5)
+      )
+          .listen((scanResult) {
+        if(scanResult.device.name == 'TECO Wearable 3'){
+          wearable = scanResult.device;
+        }
 
-    _scanSubscription = _flutterBlue
-        .scan(
-      timeout: const Duration(seconds: 5)
-    )
-        .listen((scanResult) {
-      if(scanResult.device.name == 'TECO Wearable 3'){
-        wearable = scanResult.device;
-      }
 
+      }, onDone: _connect);
+    }
+    else{
+      print('BLUETOOTH NOT ON!');
 
-    }, onDone: _connect);
+    }
+
 
   }
   void _connect() async{
