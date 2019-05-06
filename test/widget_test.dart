@@ -11,6 +11,6 @@ void main() {
     expect(find.text('Wearable Connection'), findsNWidgets(1));
 
     expect(find.text('Timer'),findsNWidgets(1));
-    
+
   });
 }
