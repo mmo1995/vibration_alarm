@@ -55,7 +55,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       setState(() {
         connecting = false;
       });
-      showDialog(context: context, builder: (BuildContext context) {
+      showDialog(barrierDismissible: false, context: context, builder: (BuildContext context) {
         return AlertDialog(
           title: new Text('Bluetooth Adapter is off'),
           content: new Text('Please Turn it on and connect again!'),
@@ -115,7 +115,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       });
     }
     else{
-      showDialog(context: context, builder: (BuildContext context) {
+      showDialog(barrierDismissible: false, context: context, builder: (BuildContext context) {
         return AlertDialog(
           title: new Text('Wearable not found'),
           content: new Text('Please Try connecting again!'),
@@ -185,7 +185,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
           break;
       }
 
-      showDialog(context: context, builder: (BuildContext context) {
+      showDialog(barrierDismissible: false, context: context, builder: (BuildContext context) {
         return AlertDialog(
           title: new Text('Alarm'),
           content: new Text('Vibrating!'),
