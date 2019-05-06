@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:vibration_alarm/WearableConnectionView.dart';
 import 'package:vibration_alarm/TimerView.dart';
-import 'package:vibration_alarm/AlarmView.dart';
 
 var input = ValueNotifier(0);
 var intensity = 0;
@@ -14,15 +13,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Vibration Alarm',
       home: DefaultTabController(
-        length: 3,
+        length: 2,
         child: Scaffold(
           appBar: AppBar(
             title: Text('My Vibration Alarm'),
             bottom: TabBar(
                 tabs: <Widget>[
-
               new Tab(text: 'Wearable Connection'),
-              new Tab(text: 'Alarm'),
               new Tab(text: 'Timer'),
 
             ]),
@@ -30,7 +27,6 @@ class MyApp extends StatelessWidget {
           body: TabBarView(
               children: [
             new WearableConnectionView(),
-            new AlarmView(),
             new TimerView()
 
           ]),
