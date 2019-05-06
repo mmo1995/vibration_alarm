@@ -165,10 +165,10 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
       showDialog(context: context, builder: (BuildContext context) {
         return AlertDialog(
-          title: new Text('VIBRATING'),
-          content: new Text('VIBRATING'),
+          title: new Text('Alarm'),
+          content: new Text('Vibrating!'),
           actions: <Widget>[
-            new FlatButton(onPressed: stopVibrating, child: new Text('Close'))
+            new FlatButton(onPressed: stopVibrating, child: new Text('Stop'))
           ],
         );
       });

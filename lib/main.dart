@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            title: Text('My Vibration Alarm'),
+            title: Text('Vibration Timer'),
             bottom: TabBar(
                 tabs: <Widget>[
               new Tab(text: 'Wearable Connection'),

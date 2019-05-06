@@ -105,7 +105,7 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
               ],)
           ],
         ),
-        new Row(children: <Widget>[Padding(padding: EdgeInsets.all(20.0))],),
+        new Row(children: <Widget>[Padding(padding: EdgeInsets.all(10.0))],),
         new Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>
