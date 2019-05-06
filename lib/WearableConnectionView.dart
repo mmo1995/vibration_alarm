@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'main.dart';
+
+/*
+* WearableConnectionView class creates the state for the wearable connection tab
+* */
 class WearableConnectionView extends StatefulWidget{
   @override
   _WearableConnectionViewState createState() => new _WearableConnectionViewState();
 }
 
+/*
+* The State of the wearable connection tab view
+* */
 class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMixin{
 
   bool blueOn;
@@ -19,6 +26,12 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
   BluetoothService vibrationService;
   BluetoothCharacteristic vibrationCharacteristic;
   var _scanSubscription;
+
+  /*
+  * scans for the wearable
+  * if adapter On -> start connecting
+  * else -> show dialog with hint to the user
+  * */
   void _scan() async{
     setState(() {
       connecting = true;
@@ -59,7 +72,13 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
 
 
   }
+  /*
+  * connecting the wearable
+  * if found -> start connecting
+  * else -> show dialog with hint to the user (wearable not found)
+  * */
   void _connect() async{
+
     _scanSubscription?.cancel();
     _scanSubscription = null;
     if(wearable != null){
@@ -70,7 +89,6 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       );
 
       input.addListener(vibrate);
-
 
       wearable.state.then((s) {
         setState(() {
@@ -113,10 +131,11 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
         connecting = false;
       });
     }
-
-
   }
 
+  /*
+  * disconnect connection of the wearable
+  * */
   void _disconnect(){
     deviceConnection?.cancel();
     input.removeListener(vibrate);
@@ -132,6 +151,9 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
     });
   }
 
+  /*
+  * start vibrating the wearable
+  * */
   void vibrate() async{
 
     if(input.value == 0){
@@ -173,15 +195,19 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
         );
       });
     }
-
-
   }
 
+  /*
+  * stop vibrating of the wearable
+  * */
   void stopVibrating(){
     Navigator.of(context).pop();
     wearable.writeCharacteristic(vibrationCharacteristic, [0x00, 0x00, 0x00, 0x00]);
   }
 
+  /*
+  * build the main view of the wearable connection
+  * */
   @override
   Widget build(BuildContext context) {
 
@@ -228,6 +254,9 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
     );
   }
 
+  /*
+  * keep state of the tab alive when changing between tabs
+  * */
   @override
   bool get wantKeepAlive => true;
 }

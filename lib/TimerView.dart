@@ -4,17 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:vibration_alarm/main.dart';
 
+/*
+* TimerView class creates the state for the timer tab
+* */
 class TimerView extends StatefulWidget{
   @override
   _TimerViewState createState() => new _TimerViewState();
 }
 
+/*
+* The State of the timer tab view
+* */
 class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeepAliveClientMixin{
 
-  final controller = new TextEditingController();
-  Timer _timer;
+  final controller = new TextEditingController(); //controller for the text form field
+  Timer _timer; //timer
   bool timerStarted = false;
 
+  /*This method saves the input ,string' from the user
+  * Then it calls startTimer()
+  * */
   void saveInput(string){
     if(timerStarted == true){
       setState(() {
@@ -33,6 +42,10 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
       startTimer();
     }
   }
+
+  /*
+  * starts the timer
+  * */
   void startTimer() {
     setState(() {
       timerStarted = true;
@@ -50,6 +63,9 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
         }));
   }
 
+  /*
+  changes the intensity of the vibration when user does
+  * */
   void changeIntensity(value){
     setState(() {
 
@@ -58,6 +74,9 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
     print(intensity);
   }
 
+  /*
+  * build the main view of the timer
+  * */
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -117,6 +136,9 @@ class _TimerViewState extends State with TickerProviderStateMixin, AutomaticKeep
     );
   }
 
+  /*
+  * keep state of the tab alive when changing between tabs
+  * */
   @override
   bool get wantKeepAlive => true;
 
