@@ -41,11 +41,12 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
     if(blueOn){
       _scanSubscription = _flutterBlue
           .scan(
-          timeout: const Duration(seconds: 5)
+          timeout: const Duration(seconds: 10)
       )
           .listen((scanResult) {
         if(scanResult.device.name == 'TECO Wearable 3'){
           wearable = scanResult.device;
+          _connect();
         }
 
 
@@ -85,7 +86,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
       deviceConnection = _flutterBlue
           .connect(wearable, timeout: const Duration(seconds: 15))
           .listen(
-        null,
+        null, onDone: _disconnect
       );
 
       input.addListener(vibrate);
@@ -109,6 +110,9 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
           });
         }
         if(s == BluetoothDeviceState.disconnected){
+          setState(() {
+            connecting = false;
+          });
           _disconnect();
           input.removeListener(vibrate);
         }
@@ -147,6 +151,9 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
   void _disconnect(){
     deviceConnection?.cancel();
     input.removeListener(vibrate);
+    setState(() {
+      connecting = false;
+    });
     wearable.state.then((s) {
       setState(() {
         deviceState = s;
@@ -253,7 +260,7 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
               child: new Text('Disconnect'),
               color: Colors.red,
               textColor: Colors.white,),
-            new RaisedButton(onPressed: (deviceState == BluetoothDeviceState.connected) ? null : _scan,
+            new RaisedButton(onPressed: (deviceState == BluetoothDeviceState.connected || connecting) ? null : _scan,
               child: new Text('Connect'),
               color: Colors.blue,
               textColor: Colors.white,),
