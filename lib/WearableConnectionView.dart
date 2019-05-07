@@ -113,6 +113,14 @@ class _WearableConnectionViewState extends State with AutomaticKeepAliveClientMi
           input.removeListener(vibrate);
         }
       });
+
+      _flutterBlue.onStateChanged().listen((s){
+        if(s == BluetoothState.off){
+          _disconnect();
+          input.removeListener(vibrate);
+        }
+
+      });
     }
     else{
       showDialog(barrierDismissible: false, context: context, builder: (BuildContext context) {
