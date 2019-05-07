@@ -22,22 +22,24 @@ class MyApp extends StatelessWidget {
       title: 'Vibration Alarm',
       home: DefaultTabController(
         length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Vibration Timer'),
-            bottom: TabBar(
-                tabs: <Widget>[
-              new Tab(text: 'Wearable Connection'),
-              new Tab(text: 'Timer'),
+        child: WillPopScope(onWillPop: () async => false,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text('Vibration Timer'),
+              bottom: TabBar(
+                  tabs: <Widget>[
+                new Tab(text: 'Wearable Connection'),
+                new Tab(text: 'Timer'),
+
+              ]),
+            ),
+            body: TabBarView(
+                children: [
+              new WearableConnectionView(),
+              new TimerView()
 
             ]),
           ),
-          body: TabBarView(
-              children: [
-            new WearableConnectionView(),
-            new TimerView()
-
-          ]),
         ),
       ),
     );
